@@ -1,0 +1,33 @@
+on:
+  workflow_run:
+    workflows: [ "Test" ]
+    types: [ completed ]
+
+name: Deploy
+
+jobs:
+  musl:
+    name: Deploy Binary (musl)
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.ref == 'refs/heads/master' }}
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout 🛎️
+      - uses: dtolnay/rust-toolchain@stable
+        name: Setup Cargo Toolchain 🛎️
+        with:
+          targets: x86_64-unknown-linux-musl
+      - run: sudo apt-get install -y musl-tools
+        name: Setup musl 🔧
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo build --release --target x86_64-unknown-linux-musl
+        name: Build Release Binary 🚀
+      - run: cp target/x86_64-unknown-linux-musl/release/tg-agda-detector ./
+      - uses: actions/upload-artifact@v4
+        name: Upload Artifact
+        with:
+          name: release-musl
+          path: tg-agda-detector
+      - run: |
+          curl -XPOST -u "PhotonQuantum:${{secrets.GH_TOKEN}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/PhotonQuantum/aquarium/dispatches --data '{"event_type": "deploy"}'
+        name: Launch 🚀

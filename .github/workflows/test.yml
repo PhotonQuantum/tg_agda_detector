@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+name: Test
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout 🛎️
+      - uses: dtolnay/rust-toolchain@stable
+        name: Setup Cargo Toolchain 🛎️
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - name: Check Code Format 🔧
+        run: cargo fmt -- --check
+      - name: Run Clippy Lints 🔨
+        run: cargo clippy --all-targets
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout 🛎️
+      - uses: dtolnay/rust-toolchain@stable
+        name: Setup Cargo Toolchain 🛎️
+      - uses: Swatinem/rust-cache@v2
+      - name: Running Tests 🚀
+        run: cargo test --workspace
