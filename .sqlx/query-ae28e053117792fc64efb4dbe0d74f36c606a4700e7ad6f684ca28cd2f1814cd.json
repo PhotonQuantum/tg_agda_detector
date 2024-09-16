@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT COUNT(*) FROM logs WHERE user_id = $1 AND timestamp >= current_timestamp - interval '1 day'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "ae28e053117792fc64efb4dbe0d74f36c606a4700e7ad6f684ca28cd2f1814cd"
+}

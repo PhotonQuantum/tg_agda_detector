@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT user_id, COUNT(*) AS count FROM logs WHERE chat_id = $1 AND timestamp >= current_timestamp - interval '1 day' GROUP BY user_id ORDER BY count DESC LIMIT 5",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "user_id",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int8"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "e41c2494a4a5239e93d797c493840b7eb545cac7ffc11b0be2b9b30b629f8332"
+}

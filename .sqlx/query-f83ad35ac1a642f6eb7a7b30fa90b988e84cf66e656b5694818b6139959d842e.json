@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO logs (msg_id, user_id, chat_id, timestamp)VALUES ($1, $2, $3, current_timestamp)ON CONFLICT (msg_id, chat_id) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Int4",
+        "Int8",
+        "Int8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f83ad35ac1a642f6eb7a7b30fa90b988e84cf66e656b5694818b6139959d842e"
+}
