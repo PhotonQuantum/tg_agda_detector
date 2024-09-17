@@ -1,5 +1,6 @@
 use eyre::Result;
 use itertools::Itertools;
+use pinyin::{Pinyin, ToPinyinMulti};
 use sqlx::PgPool;
 use std::hash::{DefaultHasher, Hash, Hasher};
 use teloxide::macros::BotCommands;
@@ -11,7 +12,15 @@ use teloxide::types::{
 };
 use teloxide::Bot;
 
-const AGDA_CHARS: &[char] = &['喔', '哦'];
+const AGDA_CHARS: &[char] = &['喔', '哦', '噢', '嗷'];
+
+fn is_agda_like(c: char) -> bool {
+    c.to_pinyin_multi().map_or(false, |p| {
+        p.into_iter()
+            .map(Pinyin::plain)
+            .any(|p| p == "a" || p == "wo" || p == "o" || p == "ao")
+    })
+}
 
 fn get_reaction(msg: &Message) -> Option<Vec<ReactionType>> {
     let text = msg.text()?;
@@ -35,11 +44,19 @@ fn get_reaction(msg: &Message) -> Option<Vec<ReactionType>> {
         return Some(vec![]);
     }
 
-    let emoji = if fst == AGDA_CHARS[0] { "🔥" } else { "🤔" };
+    let emoji = if fst == AGDA_CHARS[0] {
+        Some("🔥")
+    } else if is_agda_like(fst) && is_agda_like(snd) {
+        Some("🤔")
+    } else {
+        None
+    };
 
-    Some(vec![ReactionType::Emoji {
-        emoji: emoji.to_string(),
-    }])
+    Some(emoji.map_or_else(Vec::new, |emoji| {
+        vec![ReactionType::Emoji {
+            emoji: emoji.to_string(),
+        }]
+    }))
 }
 
 pub async fn message_handler(msg: Message, bot: Bot, pool: PgPool) -> Result<()> {
